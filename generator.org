@@ -93,6 +93,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #+NAME: onstartup
 #+begin_src emacs-lisp :results output silent
     ;; framework
+    (package-initialize)
+    
     (defvar org-archive '("org" . "http://orgmode.org/elpa/"))
     (defvar gnu-archive '("gnu" . "https://elpa.gnu.org/packages/"))
     (defvar elpa-archive '("elpa" . "https://elpa.gnu.org/packages/"))
