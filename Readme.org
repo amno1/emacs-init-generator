@@ -17,10 +17,10 @@ tool can be found in my blog.
 
 *BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
 
-Clone this repo, or download either generator.org. Open the file in Emacs and
-let it evalute startup section (the generator itself), and edit setup to suit
-your needs and taste. Once done, M-x gnerate-init-file and then M-x
-install-files to install generated files to your .emacs.d directory.
+Clone this repo, or download either generator.org or example-init.org. Open the
+file in Emacs and let it evalute startup section (the generator itself). Edit
+setup to suit your needs and taste. Once done, M-x gnerate-init-file and then
+M-x install-files to install generated files to your .emacs.d directory.
 
 OBS: do not run C-c C-v t (org-babel-tangle). This tool generates the code by
 other means. You can read more in my blog post about deatils and reasons behind.
