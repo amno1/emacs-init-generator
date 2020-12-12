@@ -670,9 +670,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
            ;;(require 'nnreddit)
 
-           (setq user-mail-address "arthur.miller@live.com"
-                 user-full-name    "Arthur Miller")
-
+           (setq user-mail-address "your-email-address-here"
+                 user-full-name    "your name here")
+           ;; for the outlook
            (setq gnus-select-method '(nnimap "live.com"
                                              (nnimap-address "imap-mail.outlook.com")
                                              (nnimap-server-port 993)
@@ -684,13 +684,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                  smtpmail-default-smtp-server "smtp-mail.outlook.com"
                  smtpmail-smtp-service 587
                  smtpmail-local-domain "homepc")
-
-           ;; (add-to-list 'mail-sources '(imap ;:server  "imap-mail.outlook.com"
-           ;;                                   :user      "arthur.miller@live.com"
-           ;;                                   :port 993
-           ;;                                   :stream ssl
-           ;;                                   :authentication login))
-           
            )
 
 ;;(setq auth-source-debug t)
