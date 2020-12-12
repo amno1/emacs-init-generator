@@ -1,0 +1,222 @@
+* About
+
+Ramblings in Art and Craft of Emacs init file configuration and Elisp.
+
+This tool combines org-mode structuring with few macros to help configure Emacs
+and it's third party packages. It is self-contained and requires no additional
+dependencies but Emacs itself. Tested with Emacs 27.1 and 28.0.50 on GNU/Linux
+and Microsoft Windows 10.
+
+I consider this as an prototype in alpha stage, and have some further ideas for
+the tool itself and some more optimizations for the generated init file. I am
+not sure when I will have time to finnish them though. The tool is usable
+though and it would be cool to get some thoughts and input. More details about
+how and why can be found in my blog.
+
+* Get Started
+
+*BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
+
+Clone this repo, or download either generator.org. Open the file in Emacs and
+let it evalute startup section (the generator itself), and edit setup to suit
+your needs and taste. Once done, M-x gnerate-init-file and then M-x
+install-files to install generated files to your .emacs.d directory.
+
+OBS: do not run C-c C-v t (org-babel-tangle). This tool generates the code by
+other means. You can read more in my blog post about deatils and reasons behind.
+
+* Usage
+
+*BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
+
+The tool is not ment to be used as a library or to be used /on a file/. It is
+self-contained which means, it contains both setup and tools needed to generate
+init files. Starting a new setup means to simply copy generator.org, open that
+file and modify the relevant sections (mostly early init and packages section).
+
+There are two files of interest in Emacs setup: early-init.el and init.el. Below
+is a description how to configure those two files with this tool.
+
+** Sections
+
+Each section is contained in it's own header.
+
+About     - contains help, license and references that influenced the tool.
+Generator - contains code for the tool itself, and is the only section
+            that needs to be evaluated when the file is opened in Emacs.
+Prolog    - early init and part of init generated before main configuration starts
+Packages  - contains main configuration part, one subheading for each package
+Epilog    - some code generated after the main configuration ends.
+
+Generally, only early init part and package sections are of interest when
+editing a configuration.
+
+** Early Init
+
+Early-init.el should be used mainly to setup some options for graphical
+components before graphical setup is initialized since it is wasteful to
+initialize them just to overwrite them and redraw them later in initialization
+process.
+
+Subsection for configuring early-init.el is found in Prolog, named /Early
+init/. Any code put there is simply copy-pasted verbatim into early-init.el. It
+is not evaluated.
+
+** Init
+
+Init.el is where the main configuration is. In order to abstract away and save
+some typing, configuration is split in three parts: init, a subheading of Prolog,
+Packages and Epilog. Of those really Packages is what is interesting. Prolog and
+Epilog contain some boiler-plate code that implements some usual optimisations
+as found in [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Hlissner's excellent Doom Faq]] or [[https://github.com/nilcons/emacs-use-package-fast][elsewhere]]. Code in Prolog and
+Epilog is written to the file verbatim, as if copy-pasted, and hopefully does
+not need to be touched.
+
+** Packages
+
+The most action happends in this section. It is here where both built-in and
+external packages are configured. The tool provides currently only two simple
+macros to configure code. This is defered setup, so most generally we wish to
+run code in either eval-after-load or in some mode hook. /with-package/ macro is
+used to generate code that will run in /eval-after-load/. It is  really just a
+shorthand for /with-eval-after-load/ macro, to make it a little bit less verbose
+to type and less noisy to look at.
+
+The second macro is called /with-hook/ and helps to write code that will be added
+to some hook. Suffix -hook often found in Emacs such as in /after-init-hook/ or
+/dired-mode-hook/ and similar can be omitted. All code in Packages section is
+evaluated rather then copy-pasted, so those macros are actually self-inserting.
+
+One reason for using self-inserting code instead of analyzing and generating
+code is that it is easier to write generator that way. At least what I think
+currently. Those macros are not written to the init file either, instead they
+are expanded and the final result is added to the file, in quest for less
+overhead.
+
+Finally there is also a small macro for binding keys. I find it a bit verbose to
+type all that code to bind keys, so I have implemented a small macro,
+/with-key-map/ again in style of use-package, or rather bind-key, another
+Wiegley's package.
+
+Here I was playing with some optimisation, and unrolled the loop that results
+from the expansion of this macro, i.e. I generated all those define key
+statments in place of the loop. It can be tested by simply replacing following
+function:
+
+#+begin_src emacs-lisp
+    (defun emit-sexp-to-init-file (sexp)
+     (append-to-init-file (prin1-to-string sexp)))
+      ;; (if (equal (symbol-name (car sexp)) "with-key-map")
+      ;;     (emit-keymap (cdr sexp))
+      ;;   (append-to-init-file (prin1-to-string sexp))))
+#+end_src
+
+with:
+
+#+begin_src emacs-lisp
+    (defun emit-sexp-to-init-file (sexp)
+     ;; (append-to-init-file (prin1-to-string sexp)))
+      (if (equal (symbol-name (car sexp)) "with-key-map")
+          (emit-keymap (cdr sexp))
+        (append-to-init-file (prin1-to-string sexp))))
+#+end_src
+
+It will unroll loops defined in /with-hook/ macro, but it seems to me that
+version with unrolled loops is actually slower than one with the loop. I am not
+sure but I think that my init file is too small so extra parsing probably adds
+more overhead than the loop itself.
+
+** Init files generation
+
+There are two commands of interest:
+
+/genereate-init-files/ - generates early-init.el and init.el the org
+                       configuration.
+
+/install-init-files/   - install init.el and early-init.el into .emacs.d. Init.el
+                       will also be byte compiled. If native compiler is present it 
+                       will be natively compiled too.
+
+Care has to be taken when starting from scratch, to remove ~/.emacs as it is
+created by Emacs on a very first startup.
+
+** Disabling a package
+
+It is sometimes useful to keep a configuration of a package despite not using it.
+Packages marked with /:disable/ tag on it's subheading are simply skipped. Observe
+also, since this is a generator, every change to configuration require file to
+be re-generated. This is not a dynamic solution like use-package.
+
+** Package installation
+
+/install-packages/ - downloads packages not tagged as :pseudo from the list.
+
+Pseudo tag is needed for configuring built-in stuff like 'Emacs' or 'Dired' so
+we can configure them as any other packages. 
+
+Currently I haven't implemented things like updateing, pinning to an archive or
+uninstalling. For updates I am using auto-package-update, and I never uninstall
+packages anyway. It wouldn't be hard to implement those things, but I don't
+think I have time nor a need for the moment; maybe in some distant future.
+
+One of goals I had was to be able to bootstrap all external packages once I
+download my configuration from git repository. Again for the simplicity, I
+thought it would be nice if everything is self-contained. As org-mode is good at
+structuring, why not use the configuration itsel as a list of packages to
+install? It adds some noise in turn by having some empty code blocks, but they
+are colapsed and thus not really in the way. Having every package listed also
+gives a nice overview of what packages are used. Since all code is in some
+macro, either in eval-after-load or in a hook, it means configuration for each
+package is well-structured and independent of each other so I can actually sort
+the list for even more order which makes it really easy to jump to things with
+helm-imenu for example. I had to write a small parser for the org file, but in
+Emacs it is almost a trivial thing to do. Take a look at /get-package-list/ if you
+are interested.
+
+* Included Files
+
+Generator.org is an almost empty configuration that just contains few packages,
+while example-setup.org is what I use personally and is more worked out example
+that shows how to use both early-init and packages sections (in case you are new
+to Emacs). Either just rename generator.org to something you will work with, and
+start by adding to it or use my example-setup.org and remove what you don't like 
+and add your stuff in. My setup is brutally minimal when it comes to graphical
+components, so if you wish to turn them on, remove respective line in early init
+section.
+
+* Contributing
+
+If you find bugs, please either send a PR or a patch in email, or open an
+issue. I don't promise I will fix it fast; we are currently waiting a baby so
+hacking is not my priority at the moment; but if I can I'll try to fix it.
+
+* References
+
+Following articles have influenced me while creating this tool:
+
+[[https://github.com/jwiegley/use-package][Use-package]]
+[[https://github.com/nilcons/emacs-use-package-fast][Emacs with use-package fast]]
+[[https://lists.gnu.org/archive/html/help-gnu-emacs/2006-01/msg00021.html][Faster Emacs Startup (Emacs developer list discussion)]]
+[[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Doom Emacs FAQ]]
+[[https://github.com/hlissner/doom-emacs/issues/310][Why is Doom Emacs so fast? (Hlissner Github)]] 
+[[https://www.reddit.com/r/emacs/comments/f3ed3r/how_is_doom_emacs_so_damn_fast/][How is Doom Emacs so Fast (Reddit question)]]
+[[https://two-wrongs.com/migrating-away-from-use-package][Migrating Away From Use-Package]]
+[[https://nullprogram.com/blog/2017/01/30/][Writing Fast(er) Lisp]]
+
+* Licence
+Copyright (C) 2020  Arthur Miller
+
+Author: Arthur Miller <arthur.miller@live.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.

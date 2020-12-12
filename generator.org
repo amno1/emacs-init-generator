@@ -1,0 +1,500 @@
+* About
+** Introduction
+
+*BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
+
+This is a small self-contained prototype of a tool to customize and generate
+init file for Emacs. No external packages are needed to use this tool except
+a (recent) version of Emacs itself. I have tested this with current master
+(28.0.50) and Emacs 27.1 release.
+
+To use it, open this document in Emacs, and let it evaluate the code. It will
+evaluate "Init-file generator" code block. That will made four interactive
+commands avialable: 
+
+generate-init-files - generates init files from this file
+install-init-files  - installs init file to user's emacs directory
+install-packages    - downloads packages if they are not already installed
+add-package         - adds new subheading and src code blocks for a package
+
+You can also add new subheading manually. All packages should be under Packages
+main heading. They will be ignored if placed elsewhere.
+
+Package name should be a package name as it is in Elpa/Melpa.
+
+There are really just two interesting macros:
+
+(with-hook /hook-name/)
+
+Anything in this macro will be added as a lambda to hook /hook-name/. Don't wrap
+in lambdas; it is done automatically.
+
+(with-package /package-name/)
+
+Code in this macro will be wrapped in eval-after-load "/package-name/". Don't type
+quotes, they are added automatically
+
+There is also
+
+(with-key-map /keymap/)
+
+This one is ment to save some typing. Map has to be present when code generated
+with this macro evals, so good place to put it is in (with-hook) macro.
+
+To remove a package from the configuration, currently you can either delete it,
+comment it out or add ":disable" somewhere after the package name in the
+heading. Observe that you need to re-generate the setup after any changes.
+
+There is small set of packages declared in this file, they are there mostly
+to serve as an example. For more worked out example, see the example setup.
+
+None of help macros are generated to init file. They are not needed for normal
+Emacs operation. When you are tweaking your init file, you will anyway open this
+file, so we can bring all needed macros in at that time. By doing this, the tool
+is self contained and contain minimal overhead.
+
+For more information about the tool itself, see the included Readme.org.
+
+** References
+[[https://github.com/jwiegley/use-package][Use-package]]
+[[https://github.com/nilcons/emacs-use-package-fast][Emacs with use-package fast]]
+[[https://lists.gnu.org/archive/html/help-gnu-emacs/2006-01/msg00021.html][Faster Emacs Startup (Emacs developer list discussion)]]
+[[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Doom Emacs FAQ]]
+[[https://github.com/hlissner/doom-emacs/issues/310][Why is Doom Emacs so fast? (Hlissner Github)]] 
+[[https://www.reddit.com/r/emacs/comments/f3ed3r/how_is_doom_emacs_so_damn_fast/][How is Doom Emacs so Fast (Reddit question)]]
+[[https://two-wrongs.com/migrating-away-from-use-package][Migrating Away From Use-Packzfage]]
+[[https://nullprogram.com/blog/2017/01/30/][Writing Fast(er) Lisp]]
+** Licence
+Copyright (C) 2020  Arthur Miller
+
+Author: Arthur Miller <arthur.miller@live.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+* Generator
+#+NAME: onstartup
+#+begin_src emacs-lisp :results output silent
+    ;; framework
+    (defvar org-archive '("org" . "http://orgmode.org/elpa/"))
+    (defvar gnu-archive '("gnu" . "https://elpa.gnu.org/packages/"))
+    (defvar elpa-archive '("elpa" . "https://elpa.gnu.org/packages/"))
+    (defvar melpa-archive '("melpa" . "https://melpa.org/packages/"))
+    (defvar melpa-stable-archive '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
+    ;; gnu = elpa is already in the list by default
+    (push melpa-archive package-archives)
+    (push melpa-stable-archive package-archives)
+    (push org-archive package-archives)
+    (setq package-archives (nreverse package-archives))
+
+    (unless (boundp 'init-file-hooks)
+      (make-variable-buffer-local 'init-file-hooks))
+    (unless (boundp 'init-file-package-list)
+      (make-variable-buffer-local 'init-file-package-list))
+ 
+    (defmacro with-hook (name &rest body)
+      (let (found hook)
+	(setq name (if (string-match "-hook\\'" (symbol-name `,name))
+		       `,name
+		     (intern (concat (symbol-name name) "-hook"))))
+	(setq body (reverse body))
+	(dolist (hook init-file-hooks)
+	  (when (equal (symbol-name (car hook)) (symbol-name name))
+	    (dolist (sexp (reverse (cdr hook)))
+	      (add-to-list 'body sexp))
+	    (setcdr hook body)
+	    (setq found t)))
+	(unless found
+	  (add-to-list 'init-file-hooks (cons name body)))
+	(ignore)))
+
+    (defmacro with-package (name &rest body)
+      (let ((package (symbol-name name)))
+	(append-to-init-file
+	 (prin1-to-string
+	  (macroexpand-all
+	   `(with-eval-after-load ,package ,@body))))))
+
+    (defmacro with-key-map (mapname &rest body)
+      `(let ((map (eval-and-compile (concat (symbol-name ',mapname) "-map")))
+	     (defs '(,@body)))
+	 (dolist (def defs)
+	   (define-key (symbol-value (intern map))
+	     (if (vectorp (car def)) (car def)
+	       (read-kbd-macro (car def))) (cdr def)))))
+
+    (defun emit-keymap (map)
+      (let ((body (cdr map))
+	    (key))
+	(dolist (stm `,@body)
+	  (if (vectorp (eval (car stm)))
+	      (setq key (prin1-to-string (car stm)))
+	    (setq key (concat "(kbd \"" (car stm) "\")")))
+	  (append-to-init-file
+	   (concat "(define-key "
+		   (symbol-name (car map)) "-map "
+		   key " '" (prin1-to-string (cdr stm))
+		   ")")))))
+
+    ;; tangle init file
+    (defun append-to-init-file (text)
+      (let ((file "init.el") insert-point)
+	(with-current-buffer (get-buffer-create file)
+	  (goto-char (point-max))
+	  (setq insert-point (point))
+	  (insert "\n")
+	  (insert text)
+	  (write-region insert-point (point-max) file t 0))))
+
+    (defun emit-sexp-to-init-file (sexp)
+     (append-to-init-file (pp sexp)))
+      ;; (if (equal (symbol-name (car sexp)) "with-key-map")
+      ;;     (emit-keymap (cdr sexp))
+      ;;   (append-to-init-file (prin1-to-string sexp))))
+
+    (defun emit-to-init-file (&rest body)
+      (dolist (sexp body)
+	(if (listp (car sexp))
+	    (dolist (s sexp)
+	      (emit-sexp-to-init-file s))
+	  (emit-sexp-to-init-file sexp))))
+
+    (defun tangle-early-init ()
+      (message "Exporting early-init.el ..."
+      (save-excursion
+        (let (start end)
+          (goto-char (point-min))
+          (re-search-forward "^\\*\\* Early init")
+          (re-search-forward "begin_src.*emacs-lisp")
+          (skip-chars-forward "\s\t\n\r")
+          (setq start (point))
+          (re-search-forward "end_src$")
+          (beginning-of-line)
+          (setq end (point))
+          (write-region start end "early-init.el" nil 0)))
+    (message "Wrote early-init.el")))
+
+    (defun tangle-init-file (&optional file)
+      ;;(message "TANGLE INIT FILE")
+      (unless file
+	  (setq file "init.el"))
+      (if (file-exists-p file)
+	  (delete-file file))
+      (if (file-exists-p (concat file "c"))
+	  (delete-file (concat file "c")))
+      (setq init-file-hooks nil)
+      (let (code-start code-end config-start)
+        (save-excursion
+          (goto-char (point-min))
+	    (setq config-start (re-search-forward "^\\* Packages"))
+	    ;; prolog
+          (message "Emiting prolog.")  
+	    (goto-char (point-min))
+	    (re-search-forward "^\\*\\* Init")
+	    (re-search-forward "begin_src.*emacs-lisp" config-start)
+	    (skip-chars-forward "\s\t\n\r")
+	    (setq code-start (point))
+	    (re-search-forward "end_src")
+	    (beginning-of-line)
+	    (write-region code-start (point) file t 0)
+	    ;; packages
+	    (dolist (p (get-package-list))
+            (message "Emiting package: %s" (aref p 0))
+            (when (package-enabled-p p)
+	        (eval-region (aref p 4) (aref p 5))))
+	    ;; emit hooks
+          (message "Emiting hooks.")  
+	    (dolist (hook init-file-hooks)
+	      (append-to-init-file (concat "(add-hook '"
+	                                    (symbol-name (car hook))
+					   " #'(lambda nil\n"))
+	    (dolist (elt (reverse (cdr hook)))
+	      (emit-to-init-file elt))
+	    (append-to-init-file "))"))
+	    ;; epilog
+          (message "Emiting epilog")
+          (goto-char (point-min))
+	    (re-search-forward "^\\* Epilog")
+	    (re-search-forward "begin_src.*emacs-lisp")
+          (skip-chars-forward "\s\t\n\r")
+	    (setq code-start (point))
+	    (re-search-forward "end_src")
+	    (beginning-of-line)
+	    (write-region code-start (point) file t 0))))
+
+    (defun create-early-init-file ()
+      (interactive)
+      (tangle-early-init)
+      (message "Tangled early init file."))
+
+    (defun create-init-file ()
+      (interactive)
+      (message "Exporting init.el ...")
+      (tangle-init-file)
+      (let ((tangled-file "init.el"))
+        (when (featurep 'nativecomp)
+	       (message "Native compiled %s" (native-compile tangled-file)))
+	  ;; always produce elc file
+	  (byte-compile-file tangled-file)
+	  (message "Tangled and compiled %s" tangled-file))
+      (message "Done."))
+
+    (defun generate-init-files ()
+      (interactive)
+      (create-init-file)
+      (create-early-init-file))
+
+    (defun install-file (file) 
+      (when (file-exists-p file)
+	    (copy-file file user-emacs-directory t)
+        (message "Wrote: %s." file)))
+
+    (defun install-init-files ()
+      (interactive)
+      (let ((el "init.el")
+	      (elc "init.elc")
+            (eil "early-init.el"))
+            (install-file el)
+            (install-file elc)
+            (install-file eil)
+	      (unless (file-exists-p elc)
+	        (byte-compile (expand-file-name el)))))
+
+    (defun get-package-list ()
+      (setq init-file-package-list nil)
+      (save-excursion
+        (goto-char (point-min))
+        (let ((bound (re-search-forward "^\\* Epilog"))
+               package packages start end)
+	         (goto-char (point-min))
+	         (re-search-forward "^\\* Packages")
+	         (while (re-search-forward "^\\*\\* " bound t)
+                 (setq package (vector nil t t "" 0 0)
+	                 start (point) end (line-end-position))
+                 ;; package name
+                 (when (re-search-forward ":" end t)
+                   (setq end (point)))
+                 (goto-char end)  
+                 (skip-chars-backward ":\s\t\r\n")
+	           (aset package 0 (intern (buffer-substring-no-properties
+	                                    start (point))))
+                 (goto-char start)
+                 ;; enabled?
+	           (when (search-forward ":disable" (line-end-position) t)
+                   (aset package 1 nil))
+	             (goto-char start)
+                 ;; not installable?
+	           (when (search-forward ":pseudo" (line-end-position) t)
+                   (aset package 2 nil))
+	             (goto-char start)
+                 ;; pinned to repository?
+                 (dolist (repo package-archives)
+                   (when (re-search-forward (concat ":" (car repo)) (line-end-position) t)
+                   (aset package 3 (car repo))))
+                 ;; code start
+	             (re-search-forward "begin_src.*emacs-lisp" bound t)
+                 (aset package 4 (point))
+	             (re-search-forward "end_src$" bound t)
+                 (beginning-of-line)
+                 (aset package 5 (point))
+                 (push package init-file-package-list)
+                 (setq init-file-package-list (nreverse init-file-package-list)))))
+                 init-file-package-list)
+
+    ;; Install packages
+    (defun ensure-package (package)
+      (let ((p (aref package 0)))
+        (unless (package-installed-p p)
+          (message "Installing package: %s" p)
+          (package-install p))))
+
+    (defun package-enabled-p (package)
+        (aref package 1))
+      
+    (defun package-installable-p (package)
+      (and (aref package 1) (aref package 2)))
+
+    (defun install-packages (&optional packages)
+      (interactive)
+      (package-initialize)
+      (package-refresh-contents)
+      (unless packages
+        (setq packages (get-package-list)))
+	  (dolist (p packages)
+          (when (package-installable-p p)
+	      (ensure-package p))))
+
+    (defun add-package (package)
+      ""
+      (interactive "sPackage name: ")
+      (goto-char (point-min))
+      (when (re-search-forward "^* Packages")
+	(forward-line 1)
+	(insert (concat "** " package
+			"\n#+begin_src emacs-lisp\n"
+			"\n#+end_src\n"))
+	(forward-line -2)))
+#+end_src
+* Prolog
+** Early init
+#+begin_src emacs-lisp
+;;; early-init.el -*- lexical-binding: t -*-
+;;
+;; This file is machine generated by init-file generator, don't edit
+;; manually, edit instead file init.org and generate new init file from it
+
+(setq gc-cons-threshold most-positive-fixnum)
+
+(unless (eq system-type 'darwin)
+  (setq command-line-ns-option-alist nil))
+;;; early-init.el ends here
+#+end_src
+** Init
+#+begin_src emacs-lisp
+;;; init.el -*- lexical-binding: t; -*-
+;;
+;; This file is machine generated by init-file generator, don't edit
+;; manually, edit instead file init.org and generate new init file from it
+
+(defvar old-file-name-handler file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
+(setq load-prefer-newer t
+      package-quickstart t        
+      package-enable-at-startup nil
+      package--init-file-ensured t)
+#+end_src
+* Packages
+** async
+#+begin_src emacs-lisp
+(with-package async
+              (autoload 'dired-async-mode "dired-async.el" nil t)
+              (async-bytecomp-package-mode 1)
+              (delight 'async-dired-mode))
+#+end_src
+** auto-package-update
+#+begin_src emacs-lisp
+(with-hook auto-package-update-after
+           (message "Refresh autoloads")
+           (package-quickstart-refresh))
+
+(with-package auto-package-update
+              (setq auto-package-update-delete-old-versions t
+                    auto-package-update-interval nil))
+#+end_src
+** beacon
+#+begin_src emacs-lisp
+(with-hook after-init
+           (beacon-mode t))
+#+end_src
+** delight
+#+begin_src emacs-lisp
+
+#+end_src
+** expand-region
+#+begin_src emacs-lisp
+(with-hook expand-region-mode
+           (delight 'expand-region-mode))
+#+end_src
+** helpful
+#+begin_src emacs-lisp
+  (with-hook after-init
+    (with-key-map global
+      ("<f1>"  . helpful-variable)
+      ("C-h v" . helpful-variable)
+      ("C-h k" . helpful-key)
+      ("C-h f" . helpful-callable)
+      ("C-h j" . helpful-at-point)
+      ("C-h u" . helpful-command)))
+#+end_src
+** org                                                                      :pseudo
+#+begin_src emacs-lisp
+  (with-package org
+
+   (defun get-html-title-from-url (url)
+     "Return content in <title> tag."
+     (require 'mm-url)
+     (let (x1 x2 (download-buffer (url-retrieve-synchronously url)))
+       (with-current-buffer download-buffer
+	 (goto-char (point-min))
+	 (setq x1 (search-forward "<title>"))
+	 (search-forward "</title>")
+	 (setq x2 (search-backward "<"))
+	 (mm-url-decode-entities-string (buffer-substring-no-properties x1 x2)))))
+
+   (defun my-org-insert-link ()
+     "Insert org link where default description is set to html title."
+     (interactive)
+     (let* ((url (read-string "URL: "))
+	    (title (get-html-title-from-url url)))
+       (org-insert-link nil url title)))
+
+   (defun org-agenda-show-agenda-and-todo (&optional arg)
+     ""
+     (interactive "P")
+     (org-agenda arg "c")
+     (org-agenda-fortnight-view))
+
+   (setq org-capture-templates
+	 `(("p" "Protocol" entry (file+headline "~/Dokument/notes.org" "Inbox")
+	    "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+	   ("L" "Protocol Link" entry (file+headline "~/Dokument/notes.org" "Inbox")
+	    "* %? [[%:link][%(transform-square-brackets-to-round-ones\"%:description\")]]\n")
+	   ("n" "Note" entry (file "~/Dokument/notes.org")
+	    "* %? %^G\n%U" :empty-lines 1)
+	   ("P" "Research project" entry (file "~/Org/inbox.org")
+	    "* TODO %^{Project title} :%^G:\n:PROPERTIES:\n:CREATED:
+		    %U\n:END:\n%^{Project description}\n** 
+		   TODO Literature review\n** TODO %?\n** TODO Summary\n** TODO Reports\n** Ideas\n" :clock-in t :clock-resume t)
+	   ("e" "Email" entry (file "~/Org/inbox.org")
+	    "* TODO %? email |- %:from: %:subject :EMAIL:\n:PROPERTIES:\n:CREATED: %U\n:EMAIL-SOURCE: %l\n:END:\n%U\n" :clock-in t :clock-resume t)))
+
+  (setq  org-log-done 'time
+	 org-ditaa-jar-path "/usr/bin/ditaa"
+	 org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))
+	 org-todo-keyword-faces '(("INPROGRESS" . (:foreground "blue" :weight bold)))
+	 org-directory (expand-file-name "~/Dokument/")
+	 org-default-notes-file (expand-file-name "notes.org" org-directory)
+	 org-use-speed-commands       t
+	 org-src-preserve-indentation t
+	 org-export-html-postamble    nil
+	 org-hide-leading-stars       t
+	 org-make-link-description    t
+	 org-hide-emphasis-markers    t
+	 org-startup-folded           'overview
+	 org-startup-indented         t))
+#+end_src
+** which-key
+#+begin_src emacs-lisp
+(with-hook after-init
+  (which-key-mode t)
+  (delight 'which-key-mode))
+#+end_src
+** wrap-region
+#+begin_src emacs-lisp
+(with-hook after-init
+  (wrap-region-global-mode t)
+  (delight 'wrap-region-mode))
+#+end_src
+* Epilog
+#+begin_src emacs-lisp
+(setq gc-cons-threshold       16777216 ; 16mb
+      gc-cons-percentage      0.1
+      file-name-handler-alist old-file-name-handler)
+  
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars unresolved))
+;; eval: (progn (org-babel-goto-named-src-block "onstartup") (org-babel-execute-src-block) (outline-hide-sublevels 2))
+;; End:
+#+end_src
+
