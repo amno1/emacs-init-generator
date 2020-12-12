@@ -58,12 +58,19 @@ For more information about the tool itself, see the included Readme.org.
 
 ** References
 [[https://github.com/jwiegley/use-package][Use-package]]
+
 [[https://github.com/nilcons/emacs-use-package-fast][Emacs with use-package fast]]
+
 [[https://lists.gnu.org/archive/html/help-gnu-emacs/2006-01/msg00021.html][Faster Emacs Startup (Emacs developer list discussion)]]
+
 [[https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-does-doom-start-up-so-quickly][Doom Emacs FAQ]]
-[[https://github.com/hlissner/doom-emacs/issues/310][Why is Doom Emacs so fast? (Hlissner Github)]] 
+
+[[https://github.com/hlissner/doom-emacs/issues/310][Why is Doom Emacs so fast? (Hlissner Github)]]
+
 [[https://www.reddit.com/r/emacs/comments/f3ed3r/how_is_doom_emacs_so_damn_fast/][How is Doom Emacs so Fast (Reddit question)]]
-[[https://two-wrongs.com/migrating-away-from-use-package][Migrating Away From Use-Packzfage]]
+
+[[https://two-wrongs.com/migrating-away-from-use-package][Migrating Away From Use-Package]]
+
 [[https://nullprogram.com/blog/2017/01/30/][Writing Fast(er) Lisp]]
 ** Licence
 Copyright (C) 2020  Arthur Miller
@@ -396,16 +403,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ** beacon
 #+begin_src emacs-lisp
 (with-hook after-init
-           (beacon-mode t))
+           (beacon-mode t)
+	   (diminish 'beacon-mode)
 #+end_src
-** delight
+** diminish
 #+begin_src emacs-lisp
 
 #+end_src
 ** expand-region
 #+begin_src emacs-lisp
 (with-hook expand-region-mode
-           (delight 'expand-region-mode))
+           (diminish 'expand-region-mode))
 #+end_src
 ** helpful
 #+begin_src emacs-lisp
@@ -440,31 +448,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 	    (title (get-html-title-from-url url)))
        (org-insert-link nil url title)))
 
-   (defun org-agenda-show-agenda-and-todo (&optional arg)
-     ""
-     (interactive "P")
-     (org-agenda arg "c")
-     (org-agenda-fortnight-view))
-
-   (setq org-capture-templates
-	 `(("p" "Protocol" entry (file+headline "~/Dokument/notes.org" "Inbox")
-	    "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-	   ("L" "Protocol Link" entry (file+headline "~/Dokument/notes.org" "Inbox")
-	    "* %? [[%:link][%(transform-square-brackets-to-round-ones\"%:description\")]]\n")
-	   ("n" "Note" entry (file "~/Dokument/notes.org")
-	    "* %? %^G\n%U" :empty-lines 1)
-	   ("P" "Research project" entry (file "~/Org/inbox.org")
-	    "* TODO %^{Project title} :%^G:\n:PROPERTIES:\n:CREATED:
-		    %U\n:END:\n%^{Project description}\n** 
-		   TODO Literature review\n** TODO %?\n** TODO Summary\n** TODO Reports\n** Ideas\n" :clock-in t :clock-resume t)
-	   ("e" "Email" entry (file "~/Org/inbox.org")
-	    "* TODO %? email |- %:from: %:subject :EMAIL:\n:PROPERTIES:\n:CREATED: %U\n:EMAIL-SOURCE: %l\n:END:\n%U\n" :clock-in t :clock-resume t)))
-
   (setq  org-log-done 'time
 	 org-ditaa-jar-path "/usr/bin/ditaa"
 	 org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))
 	 org-todo-keyword-faces '(("INPROGRESS" . (:foreground "blue" :weight bold)))
-	 org-directory (expand-file-name "~/Dokument/")
+	 org-directory (expand-file-name "~/Documents/")
 	 org-default-notes-file (expand-file-name "notes.org" org-directory)
 	 org-use-speed-commands       t
 	 org-src-preserve-indentation t
@@ -479,13 +467,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #+begin_src emacs-lisp
 (with-hook after-init
   (which-key-mode t)
-  (delight 'which-key-mode))
+  (diminish 'which-key-mode))
 #+end_src
 ** wrap-region
 #+begin_src emacs-lisp
 (with-hook after-init
   (wrap-region-global-mode t)
-  (delight 'wrap-region-mode))
+  (diminish 'wrap-region-mode))
 #+end_src
 * Epilog
 #+begin_src emacs-lisp
