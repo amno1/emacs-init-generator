@@ -184,11 +184,10 @@ Generator.org is an almost empty configuration containing just few packages,
 while example-setup.org is what I use personally and is more worked out example
 that shows how to use both early-init and packages sections (in case you are new
 to Emacs). Either just rename generator.org to something you will work with, and
-start by adding to it or use my example-setup.org and remove what you don't like 
-and add your stuff in. My setup is brutally minimal when it comes to graphical
+start by adding to it or use [[https://github.com/amno1/.emacs.d/blob/main/init.org][init.org] from [[https://github.com/amno1/.emacs.d][my own setup]] and remove what you don't
+like and add your stuff in. My setup is brutally minimal when it comes to graphical
 components, so if you wish to turn them on, remove respective line in early init
-section. OBS: while you can run it, it is missing my personal setup for Dired. I
-will upload it later during this weekend.
+section.
 
 * Contributing
 
