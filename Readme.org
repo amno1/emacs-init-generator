@@ -23,7 +23,7 @@ setup to suit your needs and taste. Once done, M-x gnerate-init-files and then
 M-x install-files to install generated files to your .emacs.d directory.
 
 OBS: do not run C-c C-v t (org-babel-tangle). This tool generates the code by
-other means. You can read more in my blog post about deatils and reasons behind.
+other means. You can read more in [[http://www.nextpoint.se/wp-admin/post.php?post=834&action=edit][my blog post]] about deatils and reasons behind.
 
 * Usage
 
