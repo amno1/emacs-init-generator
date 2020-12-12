@@ -449,7 +449,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
        (org-insert-link nil url title)))
 
   (setq  org-log-done 'time
-	 org-ditaa-jar-path "/usr/bin/ditaa"
 	 org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))
 	 org-todo-keyword-faces '(("INPROGRESS" . (:foreground "blue" :weight bold)))
 	 org-directory (expand-file-name "~/Documents/")
