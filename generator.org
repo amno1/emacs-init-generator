@@ -36,7 +36,8 @@ quotes, they are added automatically
 
 There is also
 
-(with-key-map /keymap/)
+(with-key-map /keymap/
+  (binding . function))
 
 This one is ment to save some typing. Map has to be present when code generated
 with this macro evals, so good place to put it is in (with-hook) macro.
@@ -45,8 +46,8 @@ To remove a package from the configuration, currently you can either delete it,
 comment it out or add ":disable" somewhere after the package name in the
 heading. Observe that you need to re-generate the setup after any changes.
 
-There is small set of packages declared in this file, they are there mostly
-to serve as an example. For more worked out example, see the example setup.
+There is a small set of packages declared in this file, they are there mostly
+to serve as an example. For a more worked out example, see the example-setup.org.
 
 None of help macros are generated to init file. They are not needed for normal
 Emacs operation. When you are tweaking your init file, you will anyway open this
