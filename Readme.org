@@ -18,8 +18,8 @@ tool can be found in [[http://www.nextpoint.se/?p=834][my blog post]].
 *BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
 
 Clone this repo, or download either generator.org or example-init.org. Open the
-file in Emacs and let it evalute startup section (the generator itself). Edit
-setup to suit your needs and taste. Once done, M-x gnerate-init-files and then
+downloaded file in Emacs and let it evalute startup section (the generator itself).
+Edit setup to suit your needs and taste. Once done, M-x generate-init-files and then
 M-x install-files to install generated files to your .emacs.d directory.
 
 OBS: do not run C-c C-v t (org-babel-tangle). This tool generates the code by
@@ -29,8 +29,8 @@ other means. You can read more in [[http://www.nextpoint.se/wp-admin/post.php?po
 
 *BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
 
-The tool is not ment to be used as a library or to be used /on a file/. It is
-self-contained which means, it contains both setup and tools needed to generate
+The tool is not ment to be used as a library or to be used /on a file/. It is a
+self-contained tool; i.e. it contains both a setup and code needed to generate
 init files. Starting a new setup means to simply copy generator.org, open that
 file and modify the relevant sections (mostly early init and packages section).
 
