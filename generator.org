@@ -388,7 +388,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 (with-package async
               (autoload 'dired-async-mode "dired-async.el" nil t)
               (async-bytecomp-package-mode 1)
-              (delight 'async-dired-mode))
+              (diminish 'async-dired-mode))
 #+end_src
 ** auto-package-update
 #+begin_src emacs-lisp
