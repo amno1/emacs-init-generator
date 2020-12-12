@@ -9,9 +9,9 @@ and Microsoft Windows 10.
 
 I consider this as an prototype in alpha stage, and have some further ideas for
 the tool itself and some more optimizations for the generated init file. I am
-not sure when I will have time to finnish them though. The tool is usable
-though and it would be cool to get some thoughts and input. More details about
-how and why can be found in my blog.
+not sure when I will have time to finnish them. The tool is usable though and
+it would be cool to get some thoughts and input on it. More details about the
+tool can be found in my blog.
 
 * Get Started
 
