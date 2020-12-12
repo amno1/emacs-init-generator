@@ -11,7 +11,7 @@ I consider this as an prototype in alpha stage, and have some further ideas for
 the tool itself and some more optimizations for the generated init file. I am
 not sure when I will have time to finnish them. The tool is usable though and
 it would be cool to get some thoughts and input on it. More details about the
-tool can be found in my blog.
+tool can be found in [[http://www.nextpoint.se/?p=834][my blog post]].
 
 * Get Started
 
