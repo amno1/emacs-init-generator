@@ -151,7 +151,7 @@ created by Emacs on a very first startup.
 If you put generator.org in your .emacs.d directory, you don't need to run
 /install-init-files/ command, since the tool generates init files in same directory
 where the tool is. 
-(global-set-key (kbd "C-f i" (lambda() (interactive) (find-file (expand-file-name  "init.org" user-emacs-directory)))))
+
 While experimenting and writing a configuration, it is possilbe to make a misstake
 and end-up with a non-working init file. For this reason I always test the configuration
 by running another instance of Emacs, with M-& emacs or from the command line. If Emacs
