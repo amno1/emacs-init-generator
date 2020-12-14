@@ -25,7 +25,7 @@ M-x install-files to install generated files to your .emacs.d directory.
 OBS: do not run C-c C-v t (org-babel-tangle). This tool generates the code by
 other means. You can read more in [[http://www.nextpoint.se/wp-admin/post.php?post=834&action=edit][my blog post]] about deatils and reasons behind.
 
-* Usage
+* Details about the tool
 
 *BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
 
@@ -37,7 +37,7 @@ file and modify the relevant sections (mostly early init and packages section).
 There are two files of interest in Emacs setup: early-init.el and init.el. Below
 is a description how to configure those two files with this tool.
 
-** Sections
+** Sections in the tool
 
 Each section is contained in it's own header.
 
@@ -138,12 +138,27 @@ There are two commands of interest:
 /genereate-init-files/ - generates early-init.el and init.el the org
                        configuration.
 
+** Init file installation
+
 /install-init-files/   - install init.el and early-init.el into .emacs.d. Init.el
                        will also be byte compiled. If native compiler is present it 
                        will be natively compiled too.
 
 Care has to be taken when starting from scratch, to remove ~/.emacs as it is
 created by Emacs on a very first startup.
+
+A tip: if you put generator.org in your .emacs.d directory, you don't need to run
+/install-init-files/ command, since the tool generates init files in same directory
+where the tool is. 
+
+Another tip: while experimenting and writing a configuration, it is possilbe to make a misstake
+and end-up with a non-working init file. For this reason I will always test the configuration by
+running another instance of Emacs, with M-& emacs or from the command line. If everything starts
+without problems I will then (maybe) restart my Emacs.
+
+If you end-up with error in your init file, and don't have a running Emacs process, then
+either run Emacs with -Q option or --debug-init and open the tool, edit the misstake and generate
+new init file(s).
 
 ** Disabling a package
 
