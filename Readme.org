@@ -163,8 +163,10 @@ and generate new init file(s).
 
 Bind a shortcut to open your init file, or at least make a bookmark. It is really handy to
 just press a key and have your configuration open when you hack on your Emacs. If you check
-[[https://github.com/amno1/.emacs.d][my personal configuration]] you can see I am using C-f i,
-to open the init file. You can bind your init file to a key with following:
+[[https://github.com/amno1/.emacs.d][my personal configuration]] you can see I am using /C-f i/,
+to open the init file. My init file is placed in my .emacs.d directory and renamed to init.org
+
+You can bind your init file to a key with following:
 
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-f i" (lambda() (interactive) (find-file (expand-file-name "init.org" user-emacs-directory)))))
@@ -172,6 +174,7 @@ to open the init file. You can bind your init file to a key with following:
 
 C-f is a prefix I have defined in my own Emacs, you can use some other combination or define
 C-f as a prefix.
+
 ** Disabling a package
 
 It is sometimes useful to keep a configuration of a package despite not using it.
