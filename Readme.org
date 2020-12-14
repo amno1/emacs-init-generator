@@ -79,8 +79,7 @@ not need to be touched.
 
 The most action happends in this section. It is here where both built-in and
 external packages are configured. The tool provides currently only two simple
-macros to configure the code. This is a defered setup, so most generally we wish
-to run code in either eval-after-load or in some mode hook.
+macros to configure the code:
 
 /with-package/ macro is used to generate code that will run in /eval-after-load/.
 It is  really just a shorthand for /with-eval-after-load/ macro, to make it little
@@ -91,10 +90,12 @@ bit less verbose to type and less noisy to look at.
 similar can be omitted. All code in Packages section is evaluated, so those macros
 are actually self-inserting.
 
-One reason for using self-inserting code instead of analyzing and generating
-code is that it is easier to write generator that way. At least what I think
-currently. Those macros are not written to the init file either, instead they
-are expanded and the final result is added to the file, in quest for less
+This is a defered setup, so most generally we wish to run code in either eval-after-load
+or in some mode hook.
+
+One reason for using self-inserting code is that it is easier to write the generator that
+way, at least what I think currently. Those macros are not written to the init file either,
+instead they are expanded and the final result is added to the file, in quest for less
 overhead.
 
 /with-key-map/ is a small macro for binding keys. I find it a bit verbose to
