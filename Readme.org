@@ -147,18 +147,19 @@ more overhead than the loop itself.
 Care has to be taken when starting from scratch, to remove ~/.emacs as it is
 created by Emacs on a very first startup.
 
-A tip: if you put generator.org in your .emacs.d directory, you don't need to run
+*** Tips
+If you put generator.org in your .emacs.d directory, you don't need to run
 /install-init-files/ command, since the tool generates init files in same directory
 where the tool is. 
 
-Another tip: while experimenting and writing a configuration, it is possilbe to make a misstake
-and end-up with a non-working init file. For this reason I will always test the configuration by
-running another instance of Emacs, with M-& emacs or from the command line. If everything starts
-without problems I will then (maybe) restart my Emacs.
+While experimenting and writing a configuration, it is possilbe to make a misstake
+and end-up with a non-working init file. For this reason I always test the configuration
+by running another instance of Emacs, with M-& emacs or from the command line. If Emacs
+starts without problems I will then (maybe) restart my Emacs.
 
-If you end-up with error in your init file, and don't have a running Emacs process, then
-either run Emacs with -Q option or --debug-init and open the tool, edit the misstake and generate
-new init file(s).
+If you still end-up with an error in your init file, and don't have a running Emacs process,
+then either run Emacs with --debug-init or -Q option and open the tool, edit the misstake
+and generate new init file(s).
 
 ** Disabling a package
 
