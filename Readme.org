@@ -135,7 +135,7 @@ more overhead than the loop itself.
 
 *BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
 
-/genereate-init-files/ - generates early-init.el and init.el fromt the provided
+/genereate-init-files/ - generates early-init.el and init.el from the provided
                        configuration.
 
 ** Init file installation
