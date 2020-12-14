@@ -206,7 +206,8 @@ section.
 
 If you find bugs, please either send a PR or a patch in email, or open an
 issue. I don't promise I will fix it fast; we are currently waiting a baby so
-hacking is not my priority at the moment; but if I can I'll try to fix it.
+hacking is not my priority at the moment; but if I can, I'll try to fix it as
+fast as I can.
 
 * References
 
