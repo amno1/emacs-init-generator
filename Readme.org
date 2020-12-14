@@ -89,7 +89,7 @@ similar can be omitted.
 
 All code in Packages section is evaluated, so those macros are actually self-inserting.
 
-This is a defered setup, so most generally we wish to run code in either eval-after-load
+This is a deferred setup, so most generally we wish to run code in either eval-after-load
 or in some mode hook. Thus /with-package/ is just a shorthand for /with-eval-after-load/
 macro, to make it little bit less verbose to type and less noisy to look at, albeit I
 might add some more optimizations to produced setup in this macro soon.
