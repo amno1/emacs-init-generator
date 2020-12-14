@@ -177,8 +177,8 @@ uninstalling. For updates I am using auto-package-update, and I never uninstall
 packages anyway. It wouldn't be hard to implement those things, but I don't
 think I have time nor a need for the moment; maybe in some distant future.
 
-One of goals I had was to be able to bootstrap all external packages once I
-download my configuration from git repository. Again for the simplicity, I
+One of the goals I had, was to be able to bootstrap all external packages once I
+download my configuration from the git repository. Again for the simplicity, I
 thought it would be nice if everything is self-contained. As org-mode is good at
 structuring, why not use the configuration itself as a list of packages to
 install? It adds some noise in turn by having some empty code blocks, but they
