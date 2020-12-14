@@ -82,16 +82,17 @@ external packages are configured. The tool provides currently only two simple
 macros to configure the code:
 
 /with-package/ macro is used to generate code that will run in /eval-after-load/.
-It is  really just a shorthand for /with-eval-after-load/ macro, to make it little
-bit less verbose to type and less noisy to look at.
 
 /with-hook/ is used to add the code that will be run in some Emacs hook. Suffix
 -hook often found in Emacs such as in /after-init-hook/ or /dired-mode-hook/ and
-similar can be omitted. All code in Packages section is evaluated, so those macros
-are actually self-inserting.
+similar can be omitted. 
+
+All code in Packages section is evaluated, so those macros are actually self-inserting.
 
 This is a defered setup, so most generally we wish to run code in either eval-after-load
-or in some mode hook.
+or in some mode hook. Thus /with-package/ is just a shorthand for /with-eval-after-load/
+macro, to make it little bit less verbose to type and less noisy to look at, albeit I
+might add some more optimizations to produced setup in this macro soon.
 
 One reason for using self-inserting code is that it is easier to write the generator that
 way, at least what I think currently. Those macros are not written to the init file either,
