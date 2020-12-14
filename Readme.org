@@ -151,7 +151,7 @@ created by Emacs on a very first startup.
 If you put generator.org in your .emacs.d directory, you don't need to run
 /install-init-files/ command, since the tool generates init files in same directory
 where the tool is. 
-
+(global-set-key (kbd "C-f i" (lambda() (interactive) (find-file (expand-file-name  "init.org" user-emacs-directory)))))
 While experimenting and writing a configuration, it is possilbe to make a misstake
 and end-up with a non-working init file. For this reason I always test the configuration
 by running another instance of Emacs, with M-& emacs or from the command line. If Emacs
@@ -161,6 +161,17 @@ If you still end-up with an error in your init file, and don't have a running Em
 then either run Emacs with --debug-init or -Q option and open the tool, edit the misstake
 and generate new init file(s).
 
+Bind a shortcut to open your init file, or at least make a bookmark. It is really handy to
+just press a key and have your configuration open when you hack on your Emacs. If you check
+[[https://github.com/amno1/.emacs.d][my personal configuration]] you can see I am using C-f i,
+to open the init file. You can bind your init file to a key with following:
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-f i" (lambda() (interactive) (find-file (expand-file-name "init.org" user-emacs-directory)))))
+#+end_src
+
+C-f is a prefix I have defined in my own Emacs, you can use some other combination or define
+C-f as a prefix.
 ** Disabling a package
 
 It is sometimes useful to keep a configuration of a package despite not using it.
