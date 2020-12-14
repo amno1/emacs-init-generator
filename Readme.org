@@ -27,8 +27,6 @@ other means. You can read more in [[http://www.nextpoint.se/wp-admin/post.php?po
 
 * Details about the tool
 
-*BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
-
 The tool is not ment to be used as a library or to be used /on a file/. It is a
 self-contained tool; i.e. it contains both a setup and code needed to generate
 init files. Starting a new setup means to simply copy generator.org, open that
@@ -133,7 +131,7 @@ more overhead than the loop itself.
 
 ** Init files generation
 
-There are two commands of interest:
+*BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
 
 /genereate-init-files/ - generates early-init.el and init.el the org
                        configuration.
