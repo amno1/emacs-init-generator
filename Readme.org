@@ -13,6 +13,31 @@ not sure when I will have time to finnish them. The tool is usable though and
 it would be cool to get some thoughts and input on it. More details about the
 tool can be found in [[http://www.nextpoint.se/?p=834][my blog post]].
 
+* Changelog
+
+<2020-12-18 fre>
+
+The tool can now bake `quicstart' file (package-quickstart.el) into init
+file. In my own setup this makes for a drammatic difference in startup
+time. However byte-compiling package-quickstart.el file might not work in all
+setups, so this really has to be tested with your setup.
+
+Baking of quickstart file is enabled by setting variable /init-file-bake-autloads/
+to t.
+
+If this option is on the tool will remove /package-quicstart.el/ (and .elc if
+exists) from the .emacs.d directory.
+
+If this option is nil, quickstart will be on, and tool will generate new
+package-quickstart.el and byte compile it. Both files will be installed in
+user's Emacs directory (.emacs.d).
+
+I have also implemented option to "unroll" key bindings in both with-hook and
+eval-after-load macros. The option is on by default, but can be disabled by
+setting /init-file-unroll-key-bindings/ to nil.
+
+There is a new macro to add a package with :pseudo option for the convenience.
+
 * Get Started
 
 *BACKUP YOUR INIT FILE(S) BEFORE YOU USE THIS TOOL*
@@ -35,6 +60,27 @@ file and modify the relevant sections (mostly early init and packages section).
 There are two files of interest in Emacs setup: early-init.el and init.el. Below
 is a description how to configure those two files with this tool.
 
+** Features:
+
+- self-contained
+- optimize quickstart file (precompute and prepend package load paths)
+- merge quickstart file with init file 
+- byte compile init files
+- generate unrolled key binding definitions
+- merge some generated lambdas where applicable
+- out-of-session configuration and package administration
+- very simplistic configuration options (only two macros)
+- minimal overhead at runtime
+- some of well-known hacks applied by default
+  
+** Downsided
+
+- can't be used with well-known tools like straight and use-package (it can, but
+  there is no point)
+- requires deeper knowledge of how Emacs works (mode hooks and eval-after-load)
+- not well tested, buggy and probably erronoeus at the moment
+- does a lot of assumption; not very general, nor flexible, nor robust
+  
 ** Sections in the tool
 
 Each section is contained in it's own header.
