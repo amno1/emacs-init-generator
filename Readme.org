@@ -79,7 +79,7 @@ is a description how to configure those two files with this tool.
   there is no point)
 - requires deeper knowledge of how Emacs works (mode hooks and eval-after-load)
 - not well tested, buggy and probably erronoeus at the moment
-- does a lot of assumption; not very general, nor flexible, nor robust
+- does lots of assumptions; not very general, nor flexible, nor robust
   
 ** Sections in the tool
 
