@@ -17,7 +17,7 @@ tool can be found in [[http://www.nextpoint.se/?p=834][my blog post]].
 
 <2020-12-18 fre>
 
-The tool can now bake `quicstart' file (package-quickstart.el) into init
+The tool can now bake `quickstart' file (package-quickstart.el) into init
 file. In my own setup this makes for a drammatic difference in startup
 time. However byte-compiling package-quickstart.el file might not work in all
 setups, so this really has to be tested with your setup.
@@ -25,10 +25,10 @@ setups, so this really has to be tested with your setup.
 Baking of quickstart file is enabled by setting variable /init-file-bake-autloads/
 to t.
 
-If this option is on the tool will remove /package-quicstart.el/ (and .elc if
-exists) from the .emacs.d directory.
+If this option is on, the tool will remove /package-quickstart.el/ (and .elc if
+it exists) from the .emacs.d directory.
 
-If this option is nil, quickstart will be on, and tool will generate new
+If this option is nil, the quickstart will be on, and tool will generate new
 package-quickstart.el and byte compile it. Both files will be installed in
 user's Emacs directory (.emacs.d).
 
