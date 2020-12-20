@@ -15,6 +15,16 @@ tool can be found in [[http://www.nextpoint.se/?p=834][my blog post]].
 
 * Changelog
 
+<2020-12-20 sön>
+
+Early-init tangling is now properly done completely in temporary file, not
+messing with Early init section in the generator as I hacked it hastily some day
+ago. In [[https://lists.gnu.org/archive/html/emacs-devel/2020-12/msg01103.html][mail conversation on emacs-devel]], S. Monnier (writer of package
+quickstart feature) confirmed that it is safe to byte compile
+package-quickstart.el. It will be turned on by default in future versions of
+Emacs, so I assume that it is safe to keep baking this file into init file by
+default.
+
 <2020-12-18 fre>
 
 The tool can now bake `quickstart' file (package-quickstart.el) into init
@@ -52,14 +62,6 @@ other means. You can read more in [[http://www.nextpoint.se/wp-admin/post.php?po
 
 * Details about the tool
 
-The tool is not ment to be used as a library or to be used /on a file/. It is a
-self-contained tool; i.e. it contains both a setup and code needed to generate
-init files. Starting a new setup means to simply copy generator.org, open that
-file and modify the relevant sections (mostly early init and packages section).
-
-There are two files of interest in Emacs setup: early-init.el and init.el. Below
-is a description how to configure those two files with this tool.
-
 ** Features:
 
 - self-contained
@@ -73,14 +75,24 @@ is a description how to configure those two files with this tool.
 - minimal overhead at runtime
 - some of well-known hacks applied by default
   
-** Downsided
+** Downsides
 
 - can't be used with well-known tools like straight and use-package (it can, but
   there is no point)
 - requires deeper knowledge of how Emacs works (mode hooks and eval-after-load)
 - not well tested, buggy and probably erronoeus at the moment
 - does lots of assumptions; not very general, nor flexible, nor robust
-  
+
+** Description
+
+The tool is not ment to be used as a library or to be used /on a file/. It is a
+self-contained tool; i.e. it contains both a setup and code needed to generate
+init files. Starting a new setup means to simply copy generator.org, open that
+file and modify the relevant sections (mostly early init and packages section).
+
+There are two files of interest in Emacs setup: early-init.el and init.el. Below
+is a description how to configure those two files with this tool.
+
 ** Sections in the tool
 
 Each section is contained in it's own header.
