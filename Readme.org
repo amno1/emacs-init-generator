@@ -90,9 +90,6 @@ self-contained tool; i.e. it contains both a setup and code needed to generate
 init files. Starting a new setup means to simply copy generator.org, open that
 file and modify the relevant sections (mostly early init and packages section).
 
-There are two files of interest in Emacs setup: early-init.el and init.el. Below
-is a description how to configure those two files with this tool.
-
 ** Sections in the tool
 
 Each section is contained in it's own header.
