@@ -95,7 +95,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   (defvar init-file-bake-autoloads t)
   (defvar init-file-unroll-key-bindings t)
 
-  (package-initialize)
   (package-quickstart-refresh)
   (setq package-archives nil)
 
@@ -240,32 +239,32 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 	  (pp (get-load-paths))
 	  (pq (expand-file-name "package-quickstart.el"
 				user-emacs-directory)))
-      (unless pq
-	(package-quickstart-refresh))
+      (unless (file-exists-p pq)
+	  (package-quickstart-refresh))
       (with-temp-file al
-	(insert-file-contents pq)
-	(goto-char (point-min))
-	(kill-line 3)
-	(insert (concat "\n(setq load-path (append \n'"
-			(prin1-to-string pp)
-			" load-path))\n"))
-	(while (not (eobp))
-	  (when (char-equal (char-after) ?\^L)
-	    (delete-char 1))
-	  (forward-line 1))
-	(goto-char (point-max))
-	(kill-line -5)
-	(goto-char (point-min))
-	(while (not (eobp))
-	  (when (re-search-forward "^(add-to-list" (line-end-position) t)
-	    (forward-line -1)
-	    (kill-line 3))
-	  (beginning-of-line)
-	  (forward-line 1))
-	(goto-char (point-min))
-	(while (not (eobp))
-	  (replace-string "\n\n\n" "\n")
-	  (forward-line 1)))))
+	  (insert-file-contents pq)
+	  (goto-char (point-min))
+	  (kill-line 3)
+	  (insert (concat "\n(nconc load-path \n'"
+			  (prin1-to-string pp)
+			  ")\n"))
+	  (while (not (eobp))
+	    (when (char-equal (char-after) ?\^L)
+	      (delete-char 1))
+	    (forward-line 1))
+	  (goto-char (point-max))
+	  (kill-line -5)
+	  (goto-char (point-min))
+	  (while (not (eobp))
+	    (when (re-search-forward "^(add-to-list" (line-end-position) t)
+	      (forward-line -1)
+	      (kill-line 3))
+	    (beginning-of-line)
+	    (forward-line 1))
+	  (goto-char (point-min))
+	  (while (not (eobp))
+	    (replace-string "\n\n\n" "\n")
+	    (forward-line 1)))))
 
   (defun tangle-early-init ()
     (message "Exporting early-init.el ...")
@@ -356,7 +355,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       ;; always produce elc file
       (byte-compile-file tangled-file)
       (when (featurep 'nativecomp)
-	(message "Native compiled %s" (native-compile tangled-file)))
+	  (message "Native compiled %s" (native-compile tangled-file)))
       (message "Tangled and compiled %s" tangled-file))
     (message "Done."))
 
@@ -367,7 +366,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   (defun install-file (file)
     (when (file-exists-p file)
-      (copy-file file user-emacs-directory t)
+      (unless (equal (file-name-directory buffer-file-name)
+                     (expand-file-name user-emacs-directory))
+        (copy-file file user-emacs-directory t))
       (message "Wrote: %s." file)))
 
   (defun install-init-files ()
@@ -381,16 +382,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       (install-file i)
       (install-file ei)
       (unless (file-exists-p ic)
-	(byte-compile (expand-file-name el)))
+	  (byte-compile (expand-file-name el)))
       (install-file ic)
       (unless init-file-bake-autoloads
 	  (byte-compile pq))
       (when init-file-bake-autoloads
-	;; remove package-quickstart files from .emacs.d
-	(when (file-exists-p pq)
-	  (delete-file pq))
-	(when (file-exists-p pqc)
-	  (delete-file pqc)))))
+	  ;; remove package-quickstart files from .emacs.d
+	  (when (file-exists-p pq)
+	    (delete-file pq))
+	  (when (file-exists-p pqc)
+	    (delete-file pqc)))))
 
   (defun get-package-list ()
     (when (buffer-modified-p)

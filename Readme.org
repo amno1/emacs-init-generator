@@ -14,6 +14,16 @@ it would be cool to get some thoughts and input on it. More details about the
 tool can be found in [[http://www.nextpoint.se/?p=834][my blog post]].
 
 * Changelog
+<2020-12-23 ons>
+
+A slight fix for the case when generator.org is placed in user-emacs-directory
+(.emacs.d/). In my personal setup, I have generator.org in .emacs.d renamed to
+init.org. The goal is to be able to just run M-x generate-init-files and be done
+with it. Currently, M-x install-init-files still needs to be run after, in order
+to delete quickstart files; otherwise Emacs will load those before it loads the
+init file with baked-in autoloads which will perform double work and slightly
+slow down the init time. I will move deletion of quickstart files to proper
+place at some other time.
 
 <2020-12-20 sön>
 
